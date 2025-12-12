@@ -1,5 +1,9 @@
 const db = require('../db/query')
+const {body, validationResult, matchedData} = require("express-validator");
 
+const validatedUser = [
+
+]
 function getSignUp(req, res) {
     res.render("sign-up");
 }
