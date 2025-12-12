@@ -1,20 +1,66 @@
 const path = require("node:path");
-
 const express = require("express");
-const router = require("./routes/userRoute")
-
 const session = require("express-session");
+const pgSession = require("connect-pg-simple")(session);
 const passport = require("passport");
-const localStrategy = require("passport-local").Strategy;
+const LocalStrategy = require("passport-local").Strategy;
+const pool = require("./db/pool")
+const router = require("./routes/userRoute")
 const app = express();
 
 app.use(express.urlencoded({extended: true}));
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
+passport.use(
+    new LocalStrategy(async (username, password, done) => {
+    try {
+        const {rows} = await pool.query(`SELECT * FROM usernames WHERE username = ($1)`, [username]);
+        const user = rows[0]
+
+        if (!user) {
+            return done(null, false, {message: "Incorrect username"});
+        }
+
+        return done(null, user);
+
+    } catch(err) {
+        return done(err);
+    }
+}))
+
+passport.serializeUser((user, done) => {
+  done(null, user.id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const { rows } = await pool.query("SELECT * FROM usernames WHERE id = $1", [id]);
+    const user = rows[0];
+
+    done(null, user);
+  } catch(err) {
+    done(err);
+  }
+});
+
+app.use(session({
+    store: new pgSession({
+        pool: pool,
+        tableName: 'user_sessions'
+    }),
+    secret: 'apples',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {maxAge: 7 * 24 * 60 * 60 * 1000} //7 day cookie
+}));
+
+app.use(passport.initialize());
 app.use(passport.session());
 
+
 const PORT = 3000;
+
 
 app.use('/', router);
 
