@@ -4,6 +4,7 @@ const session = require("express-session");
 const pgSession = require("connect-pg-simple")(session);
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
+const bcrypt = require("bcryptjs");
 const pool = require("./db/pool")
 const router = require("./routes/userRoute")
 const app = express();
@@ -21,6 +22,11 @@ passport.use(
         if (!user) {
             return done(null, false, {message: "Incorrect username"});
         }
+
+        const match = await bcrypt.compare(password, user.password) 
+        if (!match) {
+            return done(null, false, {message: 'Incorrect password'});
+        };
 
         return done(null, user);
 
@@ -58,9 +64,29 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use((req, res, next) => {
+  res.locals.currentUser = req.user;
+  next();
+});
 
 const PORT = 3000;
 
+app.get("/", (req, res) => {
+    res.render("index", {user: req.user});
+})
+app.post('/log-in', passport.authenticate("local", {
+    successRedirect: "/",
+    failureRedirect: "/"
+}))
+
+app.get("/log-out", (req, res, next) => {
+    req.logout((err) => {
+        if (err) {
+            return next(err);
+        }
+        res.redirect("/");
+    });
+});
 
 app.use('/', router);
 
@@ -71,4 +97,6 @@ app.listen((PORT), (error) => {
 
     console.log("App is listening at port 3000 visit here http://localhost:3000/")
 })
+
+
 

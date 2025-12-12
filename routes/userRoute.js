@@ -4,7 +4,7 @@ const passport = require("passport");
 const userController = require('../controllers/userController')
 const userRouter = Router();
 
-userRouter.get('/', userController.getSignUp);
-userRouter.post('/', userController.postSignUp);
+userRouter.get('/sign-up', userController.getSignUp);
+userRouter.post('/sign-up', userController.postSignUp);
 
 module.exports = userRouter;
