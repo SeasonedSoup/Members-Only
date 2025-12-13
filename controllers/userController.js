@@ -1,9 +1,15 @@
 const db = require('../db/query')
 const {body, validationResult, matchedData} = require("express-validator");
 
-const validatedUser = [
+const emptyErr = "must not be empty";
 
+const validateUser = [
+    body("firstName", `First Name ${emptyErr}`)
+    .trim().notEmpty(),
+    body("lastName", `Last Name ${emptyErr}`).
+    trim().notEmpty()
 ]
+
 function getSignUp(req, res) {
     res.render("sign-up");
 }
