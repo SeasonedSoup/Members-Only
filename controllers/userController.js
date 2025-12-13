@@ -6,8 +6,16 @@ const emptyErr = "must not be empty";
 const validateUser = [
     body("firstName", `First Name ${emptyErr}`)
     .trim().notEmpty(),
-    body("lastName", `Last Name ${emptyErr}`).
-    trim().notEmpty()
+    body("lastName", `Last Name ${emptyErr}`)
+    .trim().notEmpty(),
+    body("username", `Username (email*) ${emptyErr}`)
+    .trim().notEmpty().isEmail().withMessage("Must be an email"),
+    body("password", `password ${emptyErr}`).trim().notEmpty
+    .isLength({min: 8}).withMessage(`password must be atleast 8 characters`),
+    body("confirmPassword")
+    .notEmpty().withMessage("Confirmation of password is required")
+    .bail()
+    .custom((value, {req}) => value === req.body.password).withMessage("Passwords do not match")
 ]
 
 function getSignUp(req, res) {
