@@ -20,7 +20,16 @@ async function giveMembership(username) {
     }
 }
 
+async function createMessage(topic, message, userId) {
+    try {
+        await pool.query(`INSERT INTO messages (topic, message, username_id) VALUES($1, $2, $3, $4)`, [topic, message, userId])
+    } catch (err) {
+        return err;
+    }
+}
+
 module.exports = {
     addUsername,
-    giveMembership
+    giveMembership,
+    createMessage
 }

@@ -46,22 +46,30 @@ function getMembershipPage(req, res) {
 }
 
 async function postAttemptMembership(req, res) {
-    const username = res.locals.currentUser
-    if (!username) {
+    const user = res.locals.currentUser
+    if (!user) {
         res.status(401).send(`You are not yet validated as a user`);
     }
 
     const {secret} = req.body;
     if (secret === 'ducky') {
-        await db.giveMembership(username)
+        await db.giveMembership(user.username);
         res.redirect('/')
     } else {
         res.redirect('/member')
+    }
+}
+
+async function postMessage(req, res) {
+    const user = res.locals.currentUser
+    if (!user) {
+        res.status(401).send(`You are not yet validated as a user`);
     }
 }
 module.exports = {
     getSignUp,
     postSignUp,
     getMembershipPage,
-    postAttemptMembership
+    postAttemptMembership,
+    postMessage
 };
