@@ -8,10 +8,19 @@ async function addUsername(username, firstName, lastName, password) {
         'INSERT INTO usernames (username, firstName, lastName, password) VALUES($1, $2, $3, $4)', 
         [username, firstName, lastName, hashedPassword]);
     } catch (err) {
+        return err;
+    }
+}
 
+async function giveMembership(username) {
+    try {
+        await pool.query (`UPDATE usernames SET ismember = true WHERE username = ($1)`, [username]);
+    } catch (err) {
+        return err;
     }
 }
 
 module.exports = {
-    addUsername
+    addUsername,
+    giveMembership
 }

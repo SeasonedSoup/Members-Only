@@ -53,7 +53,7 @@ passport.deserializeUser(async (id, done) => {
 app.use(session({
     store: new pgSession({
         pool: pool,
-        tableName: 'user_sessions'
+        tableName: 'session'
     }),
     secret: 'apples',
     resave: false,
