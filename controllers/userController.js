@@ -49,6 +49,7 @@ async function postAttemptMembership(req, res) {
     const user = res.locals.currentUser
     if (!user) {
         res.status(401).send(`You are not yet validated as a user`);
+        return;
     }
 
     const {secret} = req.body;
@@ -60,10 +61,23 @@ async function postAttemptMembership(req, res) {
     }
 }
 
+function getMessageForm(req, res) {
+    res.render("messageForm")
+}
+
 async function postMessage(req, res) {
     const user = res.locals.currentUser
     if (!user) {
         res.status(401).send(`You are not yet validated as a user`);
+        return;
+    }
+
+    try {
+        const {topic, message} = req.body 
+        await db.createMessage(topic, message, user.id);
+        res.redirect('/')
+    } catch (err) {
+        return err;
     }
 }
 module.exports = {
@@ -71,5 +85,6 @@ module.exports = {
     postSignUp,
     getMembershipPage,
     postAttemptMembership,
+    getMessageForm,
     postMessage
 };

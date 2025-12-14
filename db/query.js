@@ -22,7 +22,17 @@ async function giveMembership(username) {
 
 async function createMessage(topic, message, userId) {
     try {
-        await pool.query(`INSERT INTO messages (topic, message, username_id) VALUES($1, $2, $3, $4)`, [topic, message, userId])
+        await pool.query(`INSERT INTO messages (topic, message, username_id) VALUES($1, $2, $3)`, [topic, message, userId]);
+       
+    } catch (err) {
+        return err;
+    }
+}
+
+async function getAllMessages() {
+    try {
+        const {rows} = await pool.query(`SELECT * FROM messages`);
+        return rows;
     } catch (err) {
         return err;
     }
