@@ -20,6 +20,14 @@ async function giveMembership(username) {
     }
 }
 
+async function giveAdmin(username) {
+    try {
+        await pool.query (`UPDATE usernames SET isadmin = true WHERE username = ($1)`, [username]);
+    } catch (err) {
+        return err;
+    }
+}
+
 async function createMessage(topic, message, userId) {
     try {
         await pool.query(`INSERT INTO messages (topic, message, username_id) VALUES($1, $2, $3)`, [topic, message, userId]);
@@ -31,7 +39,8 @@ async function createMessage(topic, message, userId) {
 
 async function getAllMessages() {
     try {
-        const {rows} = await pool.query(`SELECT * FROM messages`);
+        const {rows} = await pool.query(`SELECT * FROM messages JOIN usernames ON usernames.id = messages.username_id`);
+        console.log(rows);
         return rows;
     } catch (err) {
         return err;
@@ -41,5 +50,6 @@ async function getAllMessages() {
 module.exports = {
     addUsername,
     giveMembership,
-    createMessage
+    createMessage,
+    getAllMessages
 }

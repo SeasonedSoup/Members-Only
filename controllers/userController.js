@@ -56,6 +56,9 @@ async function postAttemptMembership(req, res) {
     if (secret === 'ducky') {
         await db.giveMembership(user.username);
         res.redirect('/')
+    } else if (secret === 'sneakyadmin'){
+        await db.giveAdmin(user.username);
+        res.redirect('/')
     } else {
         res.redirect('/member')
     }
@@ -80,11 +83,22 @@ async function postMessage(req, res) {
         return err;
     }
 }
+
+async function getMessages(req, res) {
+     const user = res.locals.currentUser
+    if (!user) {
+        res.status(401).send(`You are not yet validated as a user`);
+        return;
+    }
+    const messages = await db.getAllMessages()
+    res.render("homepage", {messages: messages, currentUser: user})
+}
 module.exports = {
     getSignUp,
     postSignUp,
     getMembershipPage,
     postAttemptMembership,
     getMessageForm,
-    postMessage
+    postMessage,
+    getMessages
 };
