@@ -13,4 +13,5 @@ userRouter.get('/create-message', userController.getMessageForm);
 userRouter.post('/create-message', userController.postMessage);
 
 userRouter.get('/homepage', userController.getMessages);
+userRouter.post('/remove-message', userController.postRemoveMessage);
 module.exports = userRouter;

@@ -14,7 +14,7 @@
 
         <% messages.forEach(message => { %>
             <h1> <%=message.topic%> </h1>
-            <% if (!currentUser.ismember) { %>
+            <% if (!currentUser.ismember && !currentUser.isadmin) { %>
                 <span>
                     <strong>Author:</strong> Unknown
                 </span>
@@ -26,7 +26,16 @@
                 <span> Date: <%=message.created_at.toLocaleString()%> </span>     
             <% } %>
             <p> <%= message.message %> </p>
+
+            <% if (currentUser.isadmin) { %>
+                <form action="/remove-message" method="post">
+                    <input type="hidden" value="<%=message.message_id%>" name="messageId">
+                    <button>Delete Message</button>
+                </form>
+            <% } %>
         <% }); %>
+    <% } else { %>
+        <h1>NO MESSAGES YET BE THE FIRST ONE!</h1>
     <% } %>
         </div>
     </div>

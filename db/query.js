@@ -39,17 +39,24 @@ async function createMessage(topic, message, userId) {
 
 async function getAllMessages() {
     try {
-        const {rows} = await pool.query(`SELECT * FROM messages JOIN usernames ON usernames.id = messages.username_id`);
+        const {rows} = await pool.query(`SELECT messages.id AS message_id, topic, message, created_at FROM messages JOIN usernames ON usernames.id = messages.username_id`);
         console.log(rows);
         return rows;
     } catch (err) {
         return err;
     }
 }
+ 
+async function deleteMessage(messageId) {
+    await pool.query(`DELETE FROM messages WHERE id = ($1)`, [messageId]);
+    
+}
 
 module.exports = {
     addUsername,
     giveMembership,
+    giveAdmin,
     createMessage,
-    getAllMessages
+    deleteMessage,
+    getAllMessages,
 }

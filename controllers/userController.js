@@ -85,7 +85,7 @@ async function postMessage(req, res) {
 }
 
 async function getMessages(req, res) {
-     const user = res.locals.currentUser
+    const user = res.locals.currentUser
     if (!user) {
         res.status(401).send(`You are not yet validated as a user`);
         return;
@@ -93,6 +93,21 @@ async function getMessages(req, res) {
     const messages = await db.getAllMessages()
     res.render("homepage", {messages: messages, currentUser: user})
 }
+
+async function postRemoveMessage(req, res) {
+    const user = res.locals.currentUser
+    if (!user || !user.isadmin) {
+        res.status(401).send(`You are not yet validated as a user nor an admin`);
+        return;
+    } 
+    
+
+    const messageId = req.body.messageId;
+
+    await db.deleteMessage(messageId);
+    res.redirect("/");
+}
+
 module.exports = {
     getSignUp,
     postSignUp,
@@ -100,5 +115,6 @@ module.exports = {
     postAttemptMembership,
     getMessageForm,
     postMessage,
-    getMessages
+    getMessages,
+    postRemoveMessage
 };
