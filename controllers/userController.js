@@ -2,6 +2,7 @@ const db = require('../db/query')
 const {body, validationResult, matchedData} = require("express-validator");
 
 const emptyErr = "must not be empty";
+const [messageTable, userTable] = [new db.MessageTbl, new db.UserTbl]
 
 const validateUser = [
     body("firstName", `First Name ${emptyErr}`)
@@ -33,7 +34,7 @@ const postSignUp = [validateUser,
         try {
             const userInfo = req.body;
 
-            await db.addUsername(userInfo.username, userInfo.firstName, userInfo.lastName, userInfo.password)
+            await messageTable.addUsername(userInfo.username, userInfo.firstName, userInfo.lastName, userInfo.password)
             res.redirect('/');
         } catch(err) {
         return next(err);
@@ -54,10 +55,10 @@ async function postAttemptMembership(req, res) {
 
     const {secret} = req.body;
     if (secret === 'ducky') {
-        await db.giveMembership(user.username);
+        await userTable.giveMembership(user.username);
         res.redirect('/')
     } else if (secret === 'sneakyadmin'){
-        await db.giveAdmin(user.username);
+        await userTable.giveAdmin(user.username);
         res.redirect('/')
     } else {
         res.redirect('/member')
@@ -77,7 +78,7 @@ async function postMessage(req, res) {
 
     try {
         const {topic, message} = req.body 
-        await db.createMessage(topic, message, user.id);
+        await messageTable.createMessage(topic, message, user.id);
         res.redirect('/')
     } catch (err) {
         return err;
@@ -90,7 +91,7 @@ async function getMessages(req, res) {
         res.status(401).send(`You are not yet validated as a user`);
         return;
     }
-    const messages = await db.getAllMessages()
+    const messages = await messageTable.getAllMessages()
     res.render("homepage", {messages: messages, currentUser: user})
 }
 
@@ -104,7 +105,7 @@ async function postRemoveMessage(req, res) {
 
     const messageId = req.body.messageId;
 
-    await db.deleteMessage(messageId);
+    await messageTable.deleteMessage(messageId);
     res.redirect("/");
 }
 
